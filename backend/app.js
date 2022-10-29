@@ -56,4 +56,42 @@ app.use(
 // connect all the routes
 app.use(routes);
 
+//the 1st handler is a regular middleware
+// ---- Catch unhandled requests and forward to error handler.
+app.use((_req, _res, next) => {
+  const err = new Error("The requested resource couldn't be found.");
+  err.title = 'Resource Not Found';
+  err.errors = ["The requested resource couldn't be found."];
+  err.status = 404;
+  next(err);
+});
+
+// the second error handler
+// ---- catching Sequelize errors and formatting them before sending the error response.
+const { ValidationError } = require('sequelize');
+
+// Process sequelize errors
+app.use((err, _req, _res, next) => {
+  // check if error is a Sequelize error:
+  if (err instanceof ValidationError) {
+    err.errors = err.errors.map(e => e.message);
+    err.title = 'Validation error';
+  }
+  next(err);
+});
+
+// the last error handler
+// ----for formatting all the errors before returning a JSON reponse
+// Error formatter
+app.use((err, _req, res, _next) => {
+  res.status(err.status || 500);
+  console.error(err);
+  res.json({
+    title: err.title || 'Server Error',
+    message: err.message,
+    errors: err.errors,
+    stack: isProduction ? null : err.stack
+  });
+});
+
 module.exports = app;
