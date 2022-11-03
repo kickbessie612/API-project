@@ -81,7 +81,7 @@ app.use((err, _req, _res, next) => {
 });
 
 // the last error handler
-// ----for formatting all the errors before returning a JSON reponse
+// ----for formatting all the errors before returning a JSON response
 // Error formatter
 app.use((err, _req, res, _next) => {
   res.status(err.status || 500);
