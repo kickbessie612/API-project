@@ -1,6 +1,6 @@
 'use strict';
-const { Model } = require('sequelize');
-const { bcrypt } = require('bcryptjs');
+const { Model, Validator } = require('sequelize');
+const bcrypt = require('bcryptjs');
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       });
+      console.log(user);
       if (user && user.validatePassword(password)) {
         return await User.scope('currentUser').findByPk(user.id);
       }
